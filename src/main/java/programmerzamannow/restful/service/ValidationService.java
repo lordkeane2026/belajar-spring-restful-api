@@ -10,17 +10,14 @@ import java.util.Set;
 
 @Service
 public class ValidationService {
-    private final Validator validator;
 
-    public ValidationService(Validator validator) {
-        this.validator = validator;
-    }
+    @Autowired
+    private Validator validator;
 
-    public void validate(Object request){
+    public void validate(Object request) {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(request);
-        if(constraintViolations.size() != 0 ){
+        if (constraintViolations.size() != 0) {
             throw new ConstraintViolationException(constraintViolations);
         }
-
     }
 }

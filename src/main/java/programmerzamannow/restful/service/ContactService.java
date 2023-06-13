@@ -14,18 +14,15 @@ import java.util.UUID;
 @Service
 public class ContactService {
 
-    private final ContactRepository contactRepository;
+    @Autowired
+    private ContactRepository contactRepository;
 
-    private final ValidationService validationService;
-
-    public ContactService(ContactRepository contactRepository, ValidationService validationService) {
-        this.contactRepository = contactRepository;
-        this.validationService = validationService;
-    }
+    @Autowired
+    private ValidationService validationService;
 
     @Transactional
     public ContactResponse create(User user, CreateContactRequest request) {
-        validationService.validate(user);
+        validationService.validate(request);
 
         Contact contact = new Contact();
         contact.setId(UUID.randomUUID().toString());
@@ -34,7 +31,13 @@ public class ContactService {
         contact.setEmail(request.getEmail());
         contact.setPhone(request.getPhone());
         contact.setUser(user);
+
         contactRepository.save(contact);
+
+        return toContactResponse(contact);
+    }
+
+    private ContactResponse toContactResponse(Contact contact) {
         return ContactResponse.builder()
                 .id(contact.getId())
                 .firstName(contact.getFirstName())
@@ -43,4 +46,5 @@ public class ContactService {
                 .phone(contact.getPhone())
                 .build();
     }
+
 }
